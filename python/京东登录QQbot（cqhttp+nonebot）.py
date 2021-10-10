@@ -2,10 +2,12 @@ import aiohttp
 import json
 from nonebot.typing import T_State
 from nonebot.plugin import on_command
+from nonebot.permission import SUPERUSER
 from nonebot.adapters.cqhttp import Bot, Event
 
 
 VerificationCode=""
+session={}
 
 async def get_VerificationCode(tel:str):
     url = "http://test.rori.cf/login"
@@ -45,6 +47,7 @@ jd_login = on_command("京东",block=True,priority=2)
 @jd_login.handle()
 async def handle_first_receive(bot: Bot, event: Event, state: T_State):
     args = str(event.get_message())
+    id=event.get_user_id()
     print(args)
     if args:
         state["tel"] = args  # 如果用户发送了参数则直接赋值
@@ -54,13 +57,16 @@ async def handle_first_receive(bot: Bot, event: Event, state: T_State):
 async def login_tel(bot: Bot, event: Event, state: T_State):
     global tel
     tel = state["tel"]
+    id=event.get_user_id()
+    global session
+    session[id]={"tel":tel}
     ws= len(str(tel))
     print (ws)
     if tel == "退出":
         await jd_login.finish(message="已退出")
     elif len(str(tel)) != 11:
         await jd_login.reject(prompt="手机号输入错误，请重新输入")
-    VerificationCode=await get_VerificationCode(tel)
+    VerificationCode=await get_VerificationCode(session[id]["tel"])
     if VerificationCode is not None:
         pass
     else:
@@ -69,13 +75,14 @@ async def login_tel(bot: Bot, event: Event, state: T_State):
 @jd_login.got("yzm", prompt="请输入获取到的验证码进行登录______退出回复退出")
 async def login_yzm(bot: Bot, event: Event, state: T_State):
     yzm = state["yzm"]
-
+    id=event.get_user_id()
+    session[id]["yzm"]=yzm
     if yzm == "退出":
         await jd_login.finish(message="已退出")
     elif len(str(yzm)) != 6:
         await jd_login.reject(prompt="验证码输入错误，请重新输入")
     print(yzm)
-    login=await get_login(tel,yzm)
+    login=await get_login(session[id]["tel"],session[id]["yzm"])
     if login is not None:
         await jd_login.finish(message="已经成功登陆，cookie为\n"+login)
     else:
