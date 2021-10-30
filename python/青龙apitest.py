@@ -31,7 +31,7 @@ pin=""
 def getnickname(cookie):
     geturl="https://get.zzzytd.top/"
     payload2 = {'cookie':cookie}
-    d=requests.get(url=geturl,data=json.dumps(payload2))
+    d=requests.post(url=geturl,data=json.dumps(payload2))
     nickname=d.text
     print (nickname)
     return nickname
