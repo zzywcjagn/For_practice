@@ -29,10 +29,8 @@ pin=""
 
 #获取京东昵称
 def getnickname(cookie):
-    geturl="https://get.zzzytd.top/nick.php"
-    payload2 = {
-        'cookie':cookie
-        }
+    geturl="https://get.zzzytd.top/"
+    payload2 = {'cookie':cookie}
     d=requests.get(url=geturl,data=json.dumps(payload2))
     nickname=d.text
     print (nickname)
