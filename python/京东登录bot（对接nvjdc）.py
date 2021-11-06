@@ -84,6 +84,13 @@ async def login_tel(bot: Bot, event: Event, state: T_State):
     else:
         await bot.send_private_msg(user_id=id,message="遇到安全验证，正在破解....")
         captcha=await AutoCaptcha(nvjdcurl,session[id]["tel"])
+        while captcha["data"]["status"] == 666:
+            captcha=await AutoCaptcha(nvjdcurl,session[id]["tel"])
+            if captcha["data"] == {}:
+                break
+        else:
+            a=captcha
+        print(captcha)
         if captcha["success"] is not False:
             pass
         else:
