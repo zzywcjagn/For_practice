@@ -88,10 +88,11 @@ async def login_tel(bot: Bot, event: Event, state: T_State):
             while captcha["data"]["status"] == 666:
                 captcha=await AutoCaptcha(nvjdcurl,session[id]["tel"])
                 if captcha["data"] == {}:
-                    await jd_login.finish(message=captcha["message"])
                     break
             else:
                 a=captcha
+            if captcha["message"]is not None:
+                await jd_login.finish(message=captcha["message"])
         else:
             pass
         
