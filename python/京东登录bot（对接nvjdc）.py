@@ -84,17 +84,17 @@ async def login_tel(bot: Bot, event: Event, state: T_State):
     else:
         await bot.send_private_msg(user_id=id,message="遇到安全验证，正在破解....")
         captcha=await AutoCaptcha(nvjdcurl,session[id]["tel"])
-        while captcha["data"]["status"] == 666:
-            captcha=await AutoCaptcha(nvjdcurl,session[id]["tel"])
-            if captcha["data"] == {}:
-                break
+        if captcha["success"] is False:
+            while captcha["data"]["status"] == 666:
+                captcha=await AutoCaptcha(nvjdcurl,session[id]["tel"])
+                if captcha["data"] == {}:
+                    await jd_login.finish(message=captcha["message"])
+                    break
+            else:
+                a=captcha
         else:
-            a=captcha
-        print(captcha)
-        if captcha["success"] is not False:
             pass
-        else:
-            await jd_login.finish(message=captcha["message"])
+        
         
 
 @jd_login.got("yzm", prompt="请输入获取到的验证码进行登录______退出回复退出")
